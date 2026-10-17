@@ -1,3 +1,17 @@
+# New Tests
+To run the new tests that have been added first you must check the config values at the top of harness.py. The main thing is a path to a openai api key must be provided to setup access to the api. Once that is set you can run harness.py to run the benchmark with hardcoded as well as the LLM based ROI systems. It will prompt you for mode 1 or 2. Mode 1 is oneShot mode where it will define the ROI on the first image. You will need to confirm it then the test will run. Mode 2 is individual where for each image the ROI will be assessed.
+- All saved data from my tests can be found in homeworkData.
+
+# Mode 1
+<p align="center">
+  <img src="/homeworkData/harness_benchmark_oneShot/updated_performance_oneShot.png" width="500">
+</p>
+
+# Mode 2
+<p align="center">
+  <img src="/homeworkData/harness_benchmark_individual/performance_comparison.png" width="500">
+</p>
+
 # ALINA: Advanced Line Identification and Notation Algorithm
 
 <p align="center">
