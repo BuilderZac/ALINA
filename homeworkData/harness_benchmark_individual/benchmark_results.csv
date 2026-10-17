@@ -1,0 +1,7 @@
+method,images,elapsed_seconds,roi_prediction_milliseconds,milliseconds_per_image,frames_evaluated,precision,recall,f1,image_width,image_height,roi_area_pixels,roi_points
+openai,50,151.3223,60420.064,3026.446,50,0.21296,0.71874,0.32768,3840,2160,1799182.08,per-image
+wide_baseline,50,67.8454,3151.958,1356.908,50,0.19649,0.8191,0.31687,3840,2160,2446447.5,per-image
+medium_baseline,50,92.5683,3168.338,1851.366,50,0.21706,0.75226,0.33625,3840,2160,1844905.5,per-image
+narrow_baseline,50,124.0432,3232.33,2480.864,50,0.14206,0.25745,0.18217,3840,2160,1290000.0,per-image
+left_biased,50,41.352,2915.552,827.041,50,0.03225,0.12428,0.0512,3840,2160,1903635.0,per-image
+right_biased,50,13.0193,2891.427,260.386,50,0.0,0.0,0.0,3840,2160,1903635.0,per-image
