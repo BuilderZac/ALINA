@@ -83,25 +83,51 @@ def process_image(img: np.ndarray, roi_points: np.ndarray, config: PipelineConfi
     return final_img, coords, True
 
 
-def run_batch(config: PipelineConfig, roi_points: np.ndarray) -> list[ImageResult]:
+def run_batch(
+    config: PipelineConfig,
+    roi_points: np.ndarray,
+    confirm_roi: bool = True,
+) -> list[ImageResult]:
     image_filenames = sorted(
         f for f in config.input_dir.iterdir() if f.suffix.lower() == ".jpg"
     )
     total = len(image_filenames)
 
-    # confirm the ROI on the reference frame before starting the batch
-    reference_quad = roi_points_to_quad(roi_points, dtype=np.int32)
-    reference_image = cv2.imread(str(image_filenames[0]))
+    if not image_filenames:
+        return []
 
-    from .roi import compute_display_scale
-    scale = compute_display_scale(reference_image, max_display_dim=1080)
-    display_image = cv2.resize(reference_image, None, fx=scale, fy=scale) if scale != 1.0 else reference_image
-    display_quad = (reference_quad * scale).astype(np.int32) if scale != 1.0 else reference_quad
+    if confirm_roi:
+        # Confirm the ROI on the reference frame before starting the batch.
+        reference_quad = roi_points_to_quad(roi_points, dtype=np.int32)
+        reference_image = cv2.imread(str(image_filenames[0]))
 
-    cv2.polylines(display_image, display_quad, True, (0, 0, 255), thickness=2)
-    cv2.imshow("Confirm ROI", display_image)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+        from .roi import compute_display_scale
+
+        scale = compute_display_scale(
+            reference_image,
+            max_display_dim=1080,
+        )
+        display_image = (
+            cv2.resize(reference_image, None, fx=scale, fy=scale)
+            if scale != 1.0
+            else reference_image
+        )
+        display_quad = (
+            (reference_quad * scale).astype(np.int32)
+            if scale != 1.0
+            else reference_quad
+        )
+
+        cv2.polylines(
+            display_image,
+            display_quad,
+            True,
+            (0, 0, 255),
+            thickness=2,
+        )
+        cv2.imshow("Confirm ROI", display_image)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
 
     print("Labeling Process Initiated!")
 
