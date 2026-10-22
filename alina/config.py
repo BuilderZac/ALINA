@@ -6,7 +6,7 @@ from pathlib import Path
 
 @dataclass
 class ROIConfig:
-    # perspective-warp target rectangle
+    # Perspective-warp target rectangle.
     dst_top_left: tuple[int, int] = (50, 100)
     dst_top_right: tuple[int, int] = (1200, 100)
     dst_bottom_right: tuple[int, int] = (1200, 800)
@@ -27,7 +27,10 @@ class PipelineConfig:
     yellow_lower: tuple[int, int, int] = (0, 70, 170)
     yellow_upper: tuple[int, int, int] = (255, 255, 255)
 
-    # zero out mask columns 0..mask_ignore_left_columns before traversal
+    threshold_method: str = "manual"
+    threshold_openai_model: str = "gpt-4.1-mini"
+
+    # Zero out mask columns 0..mask_ignore_left_columns.
     mask_ignore_left_columns: int = 300
 
     roi: ROIConfig = field(default_factory=ROIConfig)
@@ -36,8 +39,10 @@ class PipelineConfig:
         self.input_dir = Path(self.input_dir)
         self.output_images_dir = Path(self.output_images_dir)
         self.output_coords_dir = Path(self.output_coords_dir)
+
         self.output_images_dir.mkdir(parents=True, exist_ok=True)
         self.output_coords_dir.mkdir(parents=True, exist_ok=True)
+
         if self.log_file is not None:
             self.log_file = Path(self.log_file)
             self.log_file.parent.mkdir(parents=True, exist_ok=True)
@@ -49,5 +54,6 @@ class EvaluationConfig:
     alina_dirs: list[Path]
 
     def __post_init__(self) -> None:
-        self.canny_dirs = [Path(p) for p in self.canny_dirs]
-        self.alina_dirs = [Path(p) for p in self.alina_dirs]
+        self.canny_dirs = [Path(path) for path in self.canny_dirs]
+        self.alina_dirs = [Path(path) for path in self.alina_dirs]
+
