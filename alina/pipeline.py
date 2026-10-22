@@ -13,6 +13,11 @@ from .histogram import calc_histogram
 from .roi import roi_points_to_quad
 from .traversal import circular_threshold_pixel_discovery_and_traversal
 
+from pathlib import Path
+from typing import Callable, Iterable
+
+from .threshold import predict_threshold_mask
+
 
 @dataclass
 class ImageResult:
@@ -41,13 +46,16 @@ def process_image(img: np.ndarray, roi_points: np.ndarray, config: PipelineConfi
     M = cv2.getPerspectiveTransform(roi_quad, dst)
     warped = cv2.warpPerspective(img, M, (img.shape[1], img.shape[0]))
 
-    # 3.4 color feature normalization (HSV, per-channel min-max)
+    # 3.4 color feature normalization
     color_features = normalize_color_features(warped)
 
-    # 3.5 HSV-based color thresholding -> binary mask of candidate line pixels
-    lower = np.array(config.yellow_lower)
-    upper = np.array(config.yellow_upper)
-    mask = cv2.inRange(color_features, lower, upper)
+    # 3.5 configurable thresholding
+    mask = predict_threshold_mask(
+        hsv_features=color_features,
+        image=warped,
+        config=config,
+    )
+
     if config.mask_ignore_left_columns > 0:
         mask[:, :config.mask_ignore_left_columns] = 0
 
@@ -85,21 +93,59 @@ def process_image(img: np.ndarray, roi_points: np.ndarray, config: PipelineConfi
 
 def run_batch(
     config: PipelineConfig,
-    roi_points: np.ndarray,
+    roi_points: np.ndarray | None = None,
     confirm_roi: bool = True,
+    roi_selector: Callable[
+        [Path, Iterable[Path]],
+        list[tuple[int, int]],
+    ] | None = None,
+    roi_per_image: bool = False,
 ) -> list[ImageResult]:
+    """Process all JPG images using a fixed or selected ROI."""
     image_filenames = sorted(
-        f for f in config.input_dir.iterdir() if f.suffix.lower() == ".jpg"
+        path
+        for path in config.input_dir.iterdir()
+        if path.suffix.lower() == ".jpg"
     )
     total = len(image_filenames)
 
     if not image_filenames:
         return []
 
+    if roi_selector is not None and not roi_per_image:
+        selected_points = roi_selector(
+            image_filenames[0],
+            image_filenames[1:],
+        )
+        roi_points = np.asarray(
+            [selected_points],
+            dtype=np.int32,
+        )
+
+    if roi_points is None and not roi_per_image:
+        raise ValueError(
+            "A fixed ROI or roi_selector is required."
+        )
+
     if confirm_roi:
-        # Confirm the ROI on the reference frame before starting the batch.
-        reference_quad = roi_points_to_quad(roi_points, dtype=np.int32)
-        reference_image = cv2.imread(str(image_filenames[0]))
+        if roi_points is None:
+            raise ValueError(
+                "ROI confirmation requires fixed ROI points."
+            )
+
+        reference_image = cv2.imread(
+            str(image_filenames[0]),
+        )
+
+        if reference_image is None:
+            raise FileNotFoundError(
+                f"Could not read image: {image_filenames[0]}"
+            )
+
+        reference_quad = roi_points_to_quad(
+            roi_points,
+            dtype=np.int32,
+        )
 
         from .roi import compute_display_scale
 
@@ -107,11 +153,19 @@ def run_batch(
             reference_image,
             max_display_dim=1080,
         )
+
         display_image = (
-            cv2.resize(reference_image, None, fx=scale, fy=scale)
+            cv2.resize(
+                reference_image,
+                None,
+                fx=scale,
+                fy=scale,
+                interpolation=cv2.INTER_AREA,
+            )
             if scale != 1.0
-            else reference_image
+            else reference_image.copy()
         )
+
         display_quad = (
             (reference_quad * scale).astype(np.int32)
             if scale != 1.0
@@ -126,56 +180,129 @@ def run_batch(
             thickness=2,
         )
         cv2.imshow("Confirm ROI", display_image)
-        cv2.waitKey()
+        cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+    config.output_images_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    config.output_coords_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     print("Labeling Process Initiated!")
 
     results: list[ImageResult] = []
-    log_file = open(config.log_file, "w") if config.log_file else None
+    log_file = (
+        open(config.log_file, "w", encoding="utf-8")
+        if config.log_file
+        else None
+    )
 
     try:
-        for i, path in enumerate(image_filenames, start=1):
+        for index, path in enumerate(image_filenames, start=1):
             start = time.perf_counter()
-            img = cv2.imread(str(path))
-            if img is None:
+            image = cv2.imread(str(path))
+
+            if image is None:
                 continue
 
-            annotated, coords, had_lines = process_image(img, roi_points, config)
+            current_roi = roi_points
+
+            if roi_selector is not None and roi_per_image:
+                selected_points = roi_selector(
+                    path,
+                    image_filenames,
+                )
+                current_roi = np.asarray(
+                    [selected_points],
+                    dtype=np.int32,
+                )
+
+            if current_roi is None:
+                raise ValueError(
+                    f"No ROI available for {path}."
+                )
+
+            annotated, coords, had_lines = process_image(
+                image,
+                current_roi,
+                config,
+            )
             elapsed = time.perf_counter() - start
 
-            text_filename = path.stem + ".txt"
-            np.savetxt(config.output_coords_dir / text_filename, coords, fmt="%6d")
-            cv2.imwrite(str(config.output_images_dir / path.name), annotated)
-
-            status = "Labeled" if had_lines else "No lines found"
-            log_line = (
-                f"[{i}/{total}] [{status}] {path.name}: {len(coords)} px, "
-                f"elapsed {elapsed:.3f}s ({datetime.now().strftime('%H:%M:%S')})"
+            np.savetxt(
+                config.output_coords_dir / f"{path.stem}.txt",
+                coords,
+                fmt="%6d",
             )
+            cv2.imwrite(
+                str(config.output_images_dir / path.name),
+                annotated,
+            )
+
+            status = (
+                "Labeled"
+                if had_lines
+                else "No lines found"
+            )
+            log_line = (
+                f"[{index}/{total}] [{status}] {path.name}: "
+                f"{len(coords)} px, elapsed {elapsed:.3f}s "
+                f"({datetime.now().strftime('%H:%M:%S')})"
+            )
+
             print(log_line)
 
-            if log_file:
+            if log_file is not None:
                 log_file.write(log_line + "\n")
                 log_file.flush()
 
-            results.append(ImageResult(path.name, had_lines, len(coords), elapsed))
+            results.append(
+                ImageResult(
+                    filename=path.name,
+                    had_lines=had_lines,
+                    num_pixels=len(coords),
+                    elapsed_seconds=elapsed,
+                )
+            )
     finally:
-        if log_file:
+        if log_file is not None:
             log_file.close()
 
-    labeled_count = sum(1 for r in results if r.had_lines)
-    total_elapsed = sum(r.elapsed_seconds for r in results)
-    avg_ms = (total_elapsed / len(results) * 1000) if results else 0
-    fps = (1000 / avg_ms) if avg_ms else 0
+    labeled_count = sum(
+        result.had_lines
+        for result in results
+    )
+    total_elapsed = sum(
+        result.elapsed_seconds
+        for result in results
+    )
+    average_ms = (
+        total_elapsed / len(results) * 1000
+        if results
+        else 0.0
+    )
+    fps = 1000 / average_ms if average_ms else 0.0
+
     summary = (
         f"Done: {labeled_count}/{len(results)} labeled, "
-        f"avg {avg_ms:.1f}ms/frame ({fps:.2f} fps), total {total_elapsed:.1f}s"
+        f"avg {average_ms:.1f}ms/frame "
+        f"({fps:.2f} fps), "
+        f"total {total_elapsed:.1f}s"
     )
+
     print(summary)
 
     if config.log_file:
-        with open(config.log_file, "a") as f:
-            f.write(summary + "\n")
+        with open(
+            config.log_file,
+            "a",
+            encoding="utf-8",
+        ) as summary_file:
+            summary_file.write(summary + "\n")
 
     return results
+

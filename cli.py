@@ -1,61 +1,117 @@
-from __future__ import annotations
-
 import argparse
 from pathlib import Path
 
 import cv2
+import numpy as np
 
-from alina.config import PipelineConfig, EvaluationConfig
+from alina.config import EvaluationConfig, PipelineConfig
 from alina.pipeline import process_image, run_batch
-from alina.roi import select_roi
+from alina.roi import ROI_METHODS, select_roi
 from eval.cbem import create_cbem
-from eval.superimpose import overlay_coords
 from eval.evaluate import run_evaluation
+from eval.superimpose import overlay_coords
 
+from alina.threshold import available_threshold_methods
 
 def _cmd_label(args: argparse.Namespace) -> None:
     if not args.image and not args.input_dir:
-        raise SystemExit("alina label: provide either --input-dir (batch mode) or --image (single-image mode)")
+        raise SystemExit(
+            "alina label: provide either --input-dir or --image"
+        )
 
     config = PipelineConfig(
-        input_dir=args.input_dir or ".",
-        output_images_dir=args.output_images_dir,
-        output_coords_dir=args.output_coords_dir,
-        log_file=args.log_file,
+        input_dir=Path(args.input_dir or "."),
+        output_images_dir=Path(args.output_images_dir),
+        output_coords_dir=Path(args.output_coords_dir),
+        log_file=(
+            Path(args.log_file)
+            if args.log_file
+            else None
+        ),
         peak_pixel_threshold=args.peak_threshold,
         min_white_pixels=args.min_white_pixels,
         circular_threshold=args.circular_threshold,
         yellow_lower=tuple(args.yellow_lower),
         yellow_upper=tuple(args.yellow_upper),
         mask_ignore_left_columns=args.mask_ignore_left_columns,
+        threshold_method=args.threshold_method,
+        threshold_openai_model=args.threshold_openai_model,
     )
 
     if args.image:
         image_path = Path(args.image)
-        print("Draw the ROI: click Bottom-Left, Top-Left, Top-Right, Bottom-Right, then press any key.")
-        roi_points = select_roi(str(image_path))
-        img = cv2.imread(str(image_path))
-        annotated, coords, had_lines = process_image(img, roi_points, config)
+        image = cv2.imread(str(image_path))
 
-        cv2.imwrite(str(config.output_images_dir / image_path.name), annotated)
-        (config.output_coords_dir / f"{image_path.stem}.txt").write_text(
-            "\n".join(f"{x:6d}{y:6d}" for x, y in coords)
+        if image is None:
+            raise FileNotFoundError(
+                f"Could not read image: {image_path}"
+            )
+
+        if args.roi_method == "interactive":
+            roi_points = select_roi(str(image_path))
+        else:
+            selector = ROI_METHODS[args.roi_method]
+            roi_points = np.asarray(
+                [selector(image_path, [])],
+                dtype=np.int32,
+            )
+
+        annotated, coords, had_lines = process_image(
+            image,
+            roi_points,
+            config,
         )
-        print(f"{image_path.name}: {'Labeled' if had_lines else 'No lines found'}")
-        if args.show:
-            from alina.roi import compute_display_scale
-            scale = compute_display_scale(annotated, max_display_dim=1080)
-            display_annotated = cv2.resize(annotated, None, fx=scale, fy=scale) if scale != 1.0 else annotated
-            cv2.imshow("Result", display_annotated)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+
+        config.output_images_dir.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+        config.output_coords_dir.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        cv2.imwrite(
+            str(config.output_images_dir / image_path.name),
+            annotated,
+        )
+        np.savetxt(
+            config.output_coords_dir / f"{image_path.stem}.txt",
+            coords,
+            fmt="%6d",
+        )
+
+        print(
+            f"{image_path.name}: "
+            f"{'Labeled' if had_lines else 'No lines found'}"
+        )
         return
 
-    print("Hello! Welcome to ALINA.")
-    reference_image = sorted(config.input_dir.glob("*.jpg"))[0]
-    print("Draw the ROI: click Bottom-Left, Top-Left, Top-Right, Bottom-Right, then press any key.")
-    roi_points = select_roi(str(reference_image))
-    run_batch(config, roi_points)
+    image_files = sorted(
+        Path(args.input_dir).glob("*.jpg"),
+    )
+
+    if not image_files:
+        raise SystemExit(
+            f"No JPG images found in {args.input_dir}"
+        )
+
+    if args.roi_method == "interactive":
+        roi_points = select_roi(str(image_files[0]))
+
+        run_batch(
+            config,
+            roi_points=roi_points,
+            confirm_roi=True,
+        )
+        return
+
+    run_batch(
+        config,
+        roi_selector=ROI_METHODS[args.roi_method],
+        roi_per_image=args.roi_mode == "per-image",
+        confirm_roi=False,
+    )
 
 
 def _cmd_video_to_frames(args: argparse.Namespace) -> None:
@@ -101,11 +157,41 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--peak-threshold", dest="peak_threshold", type=int, default=50)
     p.add_argument("--min-white-pixels", dest="min_white_pixels", type=int, default=200)
     p.add_argument("--circular-threshold", dest="circular_threshold", type=int, default=15)
+
+    p.add_argument(
+        "--threshold-method",
+        choices=available_threshold_methods(),
+        default="manual",
+        help="Color thresholding method.",
+    )
+    p.add_argument(
+        "--threshold-openai-model",
+        default="gpt-4.1-mini",
+        help="OpenAI model used by the openai threshold method.",
+    )
+
     p.add_argument("--yellow-lower", dest="yellow_lower", type=int, nargs=3, default=[0, 70, 170], metavar=("H", "S", "V"))
     p.add_argument("--yellow-upper", dest="yellow_upper", type=int, nargs=3, default=[255, 255, 255], metavar=("H", "S", "V"))
     p.add_argument("--mask-ignore-left-columns", dest="mask_ignore_left_columns", type=int, default=300)
     p.add_argument("--image", default=None, help="Process a single image instead of the whole --input-dir.")
     p.add_argument("--show", action="store_true", help="Display the result window (single-image mode only).")
+
+    p.add_argument(
+        "--roi-method",
+        choices=["interactive", *ROI_METHODS.keys()],
+        default="interactive",
+        help="ROI selection method.",
+    )
+    p.add_argument(
+        "--roi-mode",
+        choices=["first", "per-image"],
+        default="first",
+        help=(
+            "Reuse the first ROI or select one ROI "
+            "for every image."
+        ),
+    )
+
     p.set_defaults(func=_cmd_label)
 
     p = sub.add_parser("video-to-frames", help="Extract frames from a video file.")
