@@ -1,0 +1,69 @@
+{
+  "created_at": "2026-10-23T23:41:19.440841+00:00",
+  "suite": "threshold",
+  "roi_method": "medium_modded",
+  "threshold_mode": "per-image",
+  "method": "random_forest",
+  "threshold_seed": 42,
+  "videos": [
+    {
+      "video": "vidd_1",
+      "return_code": 0,
+      "metrics": {
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "average_ms": 6100.9,
+        "fps": 0.16,
+        "total_seconds": 305.0,
+        "labeled_frames": 46,
+        "total_frames": 50
+      },
+      "log": "outputs/master_tests/threshold/per-image/random_forest/vidd_1/run.log"
+    },
+    {
+      "video": "vidd_2",
+      "return_code": 0,
+      "metrics": {
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "average_ms": 2904.0,
+        "fps": 0.34,
+        "total_seconds": 145.2,
+        "labeled_frames": 0,
+        "total_frames": 50
+      },
+      "log": "outputs/master_tests/threshold/per-image/random_forest/vidd_2/run.log"
+    },
+    {
+      "video": "vidd_3",
+      "return_code": 0,
+      "metrics": {
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "average_ms": 2935.1,
+        "fps": 0.34,
+        "total_seconds": 146.8,
+        "labeled_frames": 0,
+        "total_frames": 50
+      },
+      "log": "outputs/master_tests/threshold/per-image/random_forest/vidd_3/run.log"
+    }
+  ],
+  "evaluation": {
+    "return_code": 0,
+    "metrics": {
+      "precision": 0.26364232536683063,
+      "recall": 0.2995375334840488,
+      "f1": 0.2792662858205096,
+      "average_ms": null,
+      "fps": null,
+      "total_seconds": null,
+      "labeled_frames": null,
+      "total_frames": null
+    },
+    "log": "outputs/master_tests/threshold/per-image/random_forest/evaluation.log"
+  }
+}

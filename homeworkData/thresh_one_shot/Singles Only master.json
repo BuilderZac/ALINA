@@ -1,0 +1,428 @@
+{
+  "created_at": "2026-10-23T23:28:52.533760+00:00",
+  "project_root": "/var/home/cmdr/Downloads/mleHomework5/ALINA",
+  "tests_root": "/var/home/cmdr/Downloads/mleHomework5/ALINA/outputs/master_tests",
+  "test_count": 6,
+  "tests": [
+    {
+      "created_at": "2026-10-23T23:09:27.838718+00:00",
+      "suite": "threshold",
+      "roi_method": "medium_modded",
+      "threshold_mode": "first",
+      "method": "gmm",
+      "threshold_seed": 42,
+      "videos": [
+        {
+          "video": "vidd_1",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 783.4,
+            "fps": 1.28,
+            "total_seconds": 39.2,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/gmm/vidd_1/run.log"
+        },
+        {
+          "video": "vidd_2",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 56874.3,
+            "fps": 0.02,
+            "total_seconds": 2843.7,
+            "labeled_frames": 50,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/gmm/vidd_2/run.log"
+        },
+        {
+          "video": "vidd_3",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 45064.4,
+            "fps": 0.02,
+            "total_seconds": 2253.2,
+            "labeled_frames": 50,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/gmm/vidd_3/run.log"
+        }
+      ],
+      "evaluation": {
+        "return_code": 0,
+        "metrics": {
+          "precision": 0.03138442215013422,
+          "recall": 0.26346363542687073,
+          "f1": 0.049517446091205404,
+          "average_ms": null,
+          "fps": null,
+          "total_seconds": null,
+          "labeled_frames": null,
+          "total_frames": null
+        },
+        "log": "outputs/master_tests/threshold/first/gmm/evaluation.log"
+      },
+      "run_file": "outputs/master_tests/threshold/first/gmm/run.json"
+    },
+    {
+      "created_at": "2026-10-23T21:30:42.110815+00:00",
+      "suite": "threshold",
+      "roi_method": "medium_modded",
+      "threshold_mode": "first",
+      "method": "kmeans",
+      "threshold_seed": 42,
+      "videos": [
+        {
+          "video": "vidd_1",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 165.9,
+            "fps": 6.03,
+            "total_seconds": 8.3,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/kmeans/vidd_1/run.log"
+        },
+        {
+          "video": "vidd_2",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 63923.1,
+            "fps": 0.02,
+            "total_seconds": 3196.2,
+            "labeled_frames": 50,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/kmeans/vidd_2/run.log"
+        },
+        {
+          "video": "vidd_3",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 158.1,
+            "fps": 6.32,
+            "total_seconds": 7.9,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/kmeans/vidd_3/run.log"
+        }
+      ],
+      "evaluation": {
+        "return_code": 0,
+        "metrics": {
+          "precision": 0.04784974147577077,
+          "recall": 0.23366487468856176,
+          "f1": 0.07551161545633174,
+          "average_ms": null,
+          "fps": null,
+          "total_seconds": null,
+          "labeled_frames": null,
+          "total_frames": null
+        },
+        "log": "outputs/master_tests/threshold/first/kmeans/evaluation.log"
+      },
+      "run_file": "outputs/master_tests/threshold/first/kmeans/run.json"
+    },
+    {
+      "created_at": "2026-10-23T20:36:55.786066+00:00",
+      "suite": "threshold",
+      "roi_method": "medium_modded",
+      "threshold_mode": "first",
+      "method": "manual",
+      "threshold_seed": 42,
+      "videos": [
+        {
+          "video": "vidd_1",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 1653.7,
+            "fps": 0.6,
+            "total_seconds": 82.7,
+            "labeled_frames": 45,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/manual/vidd_1/run.log"
+        },
+        {
+          "video": "vidd_2",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 54.9,
+            "fps": 18.2,
+            "total_seconds": 2.7,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/manual/vidd_2/run.log"
+        },
+        {
+          "video": "vidd_3",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 57.6,
+            "fps": 17.38,
+            "total_seconds": 2.9,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/manual/vidd_3/run.log"
+        }
+      ],
+      "evaluation": {
+        "return_code": 0,
+        "metrics": {
+          "precision": 0.2928346168154873,
+          "recall": 0.28117002514089523,
+          "f1": 0.2862560849263927,
+          "average_ms": null,
+          "fps": null,
+          "total_seconds": null,
+          "labeled_frames": null,
+          "total_frames": null
+        },
+        "log": "outputs/master_tests/threshold/first/manual/evaluation.log"
+      },
+      "run_file": "outputs/master_tests/threshold/first/manual/run.json"
+    },
+    {
+      "created_at": "2026-10-23T23:28:09.822195+00:00",
+      "suite": "threshold",
+      "roi_method": "medium_modded",
+      "threshold_mode": "first",
+      "method": "openai",
+      "threshold_seed": 42,
+      "videos": [
+        {
+          "video": "vidd_1",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 1499.3,
+            "fps": 0.67,
+            "total_seconds": 75.0,
+            "labeled_frames": 42,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/openai/vidd_1/run.log"
+        },
+        {
+          "video": "vidd_2",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 101.5,
+            "fps": 9.85,
+            "total_seconds": 5.1,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/openai/vidd_2/run.log"
+        },
+        {
+          "video": "vidd_3",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 101.0,
+            "fps": 9.9,
+            "total_seconds": 5.0,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/openai/vidd_3/run.log"
+        }
+      ],
+      "evaluation": {
+        "return_code": 0,
+        "metrics": {
+          "precision": 0.2527279531292794,
+          "recall": 0.23597678014314083,
+          "f1": 0.24138521699126425,
+          "average_ms": null,
+          "fps": null,
+          "total_seconds": null,
+          "labeled_frames": null,
+          "total_frames": null
+        },
+        "log": "outputs/master_tests/threshold/first/openai/evaluation.log"
+      },
+      "run_file": "outputs/master_tests/threshold/first/openai/run.json"
+    },
+    {
+      "created_at": "2026-10-23T23:19:14.655230+00:00",
+      "suite": "threshold",
+      "roi_method": "medium_modded",
+      "threshold_mode": "first",
+      "method": "random_forest",
+      "threshold_seed": 42,
+      "videos": [
+        {
+          "video": "vidd_1",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 5896.2,
+            "fps": 0.17,
+            "total_seconds": 294.8,
+            "labeled_frames": 46,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/random_forest/vidd_1/run.log"
+        },
+        {
+          "video": "vidd_2",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 2845.0,
+            "fps": 0.35,
+            "total_seconds": 142.3,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/random_forest/vidd_2/run.log"
+        },
+        {
+          "video": "vidd_3",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 2904.1,
+            "fps": 0.34,
+            "total_seconds": 145.2,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/random_forest/vidd_3/run.log"
+        }
+      ],
+      "evaluation": {
+        "return_code": 0,
+        "metrics": {
+          "precision": 0.26364232536683063,
+          "recall": 0.2995375334840488,
+          "f1": 0.2792662858205096,
+          "average_ms": null,
+          "fps": null,
+          "total_seconds": null,
+          "labeled_frames": null,
+          "total_frames": null
+        },
+        "log": "outputs/master_tests/threshold/first/random_forest/evaluation.log"
+      },
+      "run_file": "outputs/master_tests/threshold/first/random_forest/run.json"
+    },
+    {
+      "created_at": "2026-10-23T23:26:40.539982+00:00",
+      "suite": "threshold",
+      "roi_method": "medium_modded",
+      "threshold_mode": "first",
+      "method": "xgboost",
+      "threshold_seed": 42,
+      "videos": [
+        {
+          "video": "vidd_1",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 4883.5,
+            "fps": 0.2,
+            "total_seconds": 244.2,
+            "labeled_frames": 46,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/xgboost/vidd_1/run.log"
+        },
+        {
+          "video": "vidd_2",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 1983.7,
+            "fps": 0.5,
+            "total_seconds": 99.2,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/xgboost/vidd_2/run.log"
+        },
+        {
+          "video": "vidd_3",
+          "return_code": 0,
+          "metrics": {
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "average_ms": 1931.7,
+            "fps": 0.52,
+            "total_seconds": 96.6,
+            "labeled_frames": 0,
+            "total_frames": 50
+          },
+          "log": "outputs/master_tests/threshold/first/xgboost/vidd_3/run.log"
+        }
+      ],
+      "evaluation": {
+        "return_code": 0,
+        "metrics": {
+          "precision": 0.2690620531903325,
+          "recall": 0.29952291812745235,
+          "f1": 0.28235406413763753,
+          "average_ms": null,
+          "fps": null,
+          "total_seconds": null,
+          "labeled_frames": null,
+          "total_frames": null
+        },
+        "log": "outputs/master_tests/threshold/first/xgboost/evaluation.log"
+      },
+      "run_file": "outputs/master_tests/threshold/first/xgboost/run.json"
+    }
+  ]
+}

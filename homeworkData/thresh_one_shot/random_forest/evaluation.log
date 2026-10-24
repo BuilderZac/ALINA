@@ -1,0 +1,8 @@
+started: 2026-10-23T23:19:13.896243+00:00
+finished: 2026-10-23T23:19:14.654651+00:00
+return_code: 0
+command: /var/home/cmdr/Downloads/mleHomework4/ALINA/.venv/bin/python3 cli.py evaluate --canny-dirs /var/home/cmdr/Downloads/mleHomework5/ALINA/data/Labeled_Data/vidd_1/textfiles /var/home/cmdr/Downloads/mleHomework5/ALINA/data/Labeled_Data/vidd_2/textfiles /var/home/cmdr/Downloads/mleHomework5/ALINA/data/Labeled_Data/vidd_3/textfiles --alina-dirs /var/home/cmdr/Downloads/mleHomework5/ALINA/outputs/master_tests/threshold/first/random_forest/vidd_1/textfiles /var/home/cmdr/Downloads/mleHomework5/ALINA/outputs/master_tests/threshold/first/random_forest/vidd_2/textfiles /var/home/cmdr/Downloads/mleHomework5/ALINA/outputs/master_tests/threshold/first/random_forest/vidd_3/textfiles
+
+Average Recall: 29.953753348404884%
+Average Precision: 26.364232536683065%
+Average F1: 27.926628582050963%
