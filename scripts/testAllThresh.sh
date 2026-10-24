@@ -6,14 +6,23 @@ PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 cd "${PROJECT_ROOT}"
 
 PYTHON="${PYTHON:-python}"
-ROI_METHOD="${ROI_METHOD:-medium}"
+ROI_METHOD="${ROI_METHOD:-medium_modded}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-outputs/threshold_benchmark}"
 RUN_LABELING="${RUN_LABELING:-1}"
 
+RANDOM_FOREST_MODEL="${RANDOM_FOREST_MODEL:-${PROJECT_ROOT}/random_forest.joblib}"
+XGBOOST_MODEL="${XGBOOST_MODEL:-${PROJECT_ROOT}/xgboost.joblib}"
+
+
 THRESHOLD_METHODS=(
     manual
+    kmeans
+    gmm
+    random_forest
+    xgboost
     openai
 )
+
 
 VIDEO_NAMES=(
     vidd_1
@@ -64,6 +73,23 @@ for threshold_method in "${THRESHOLD_METHODS[@]}"; do
                 "${output_dir}/annotations" \
                 "${output_dir}/textfiles"
 
+            threshold_model_args=()
+
+            case "${threshold_method}" in
+                random_forest)
+                    threshold_model_args=(
+                        --threshold-model-path
+                        "${RANDOM_FOREST_MODEL}"
+                    )
+                    ;;
+                xgboost)
+                    threshold_model_args=(
+                        --threshold-model-path
+                        "${XGBOOST_MODEL}"
+                    )
+                    ;;
+            esac
+
             "${PYTHON}" cli.py label \
                 --input-dir "${input_dir}" \
                 --output-images-dir "${output_dir}/annotations" \
@@ -71,7 +97,8 @@ for threshold_method in "${THRESHOLD_METHODS[@]}"; do
                 --roi-method "${ROI_METHOD}" \
                 --roi-mode first \
                 --threshold-method "${threshold_method}" \
-                --log-file "${output_dir}/timing.log"
+                --log-file "${output_dir}/timing.log" \
+                "${threshold_model_args[@]}"
         done
     fi
 
