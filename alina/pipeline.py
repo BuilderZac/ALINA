@@ -56,6 +56,18 @@ def process_image(img: np.ndarray, roi_points: np.ndarray, config: PipelineConfi
         config=config,
     )
 
+    # Only the destination rectangle contains a valid perspective warp.
+    # This prevents pixels outside the ROI from affecting thresholding.
+    roi_mask = np.zeros_like(mask, dtype=np.uint8)
+    cv2.rectangle(
+        roi_mask,
+        config.roi.dst_top_left,
+        config.roi.dst_bottom_right,
+        255,
+        thickness=-1,
+    )
+    mask = cv2.bitwise_and(mask, roi_mask)
+
     if config.mask_ignore_left_columns > 0:
         mask[:, :config.mask_ignore_left_columns] = 0
 

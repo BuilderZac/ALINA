@@ -35,7 +35,12 @@ def _cmd_label(args: argparse.Namespace) -> None:
         yellow_upper=tuple(args.yellow_upper),
         mask_ignore_left_columns=args.mask_ignore_left_columns,
         threshold_method=args.threshold_method,
+        threshold_mode=args.threshold_mode,
         threshold_openai_model=args.threshold_openai_model,
+        threshold_model_path=args.threshold_model_path,
+        threshold_seed=args.threshold_seed,
+        threshold_clusters=args.threshold_clusters,
+        threshold_sample_size=args.threshold_sample_size,
     )
 
     if args.image:
@@ -168,6 +173,39 @@ def build_parser() -> argparse.ArgumentParser:
         "--threshold-openai-model",
         default="gpt-4.1-mini",
         help="OpenAI model used by the openai threshold method.",
+    )
+
+    p.add_argument(
+        "--threshold-model-path",
+        default=None,
+        help="Path to a trained Random Forest or XGBoost model.",
+    )
+    p.add_argument(
+        "--threshold-seed",
+        type=int,
+        default=42,
+        help="Random seed for deterministic ML thresholding.",
+    )
+    p.add_argument(
+        "--threshold-clusters",
+        type=int,
+        default=3,
+        help="Number of K-means/GMM color clusters.",
+    )
+    p.add_argument(
+        "--threshold-sample-size",
+        type=int,
+        default=25000,
+        help="Maximum pixels used to fit unsupervised models.",
+    )
+    p.add_argument(
+        "--threshold-mode",
+        choices=("first", "per-image"),
+        default="first",
+        help=(
+            "Learn threshold parameters from the first frame and reuse "
+            "them, or learn independently for every frame."
+        ),
     )
 
     p.add_argument("--yellow-lower", dest="yellow_lower", type=int, nargs=3, default=[0, 70, 170], metavar=("H", "S", "V"))

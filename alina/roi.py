@@ -71,6 +71,21 @@ def roi_medium(
     ]
 
 
+def roi_medium_modded(
+    first_image: Path,
+    following_images: Iterable[Path],
+) -> list[tuple[int, int]]:
+    del following_images
+    width, height = read_image_size(first_image)
+
+    return [
+        (int(width * 0.16), int(height * 0.70)),
+        (int(width * 0.36), int(height * 0.52)),
+        (int(width * 0.64), int(height * 0.52)),
+        (int(width * 0.84), int(height * 0.70)),
+    ]
+
+
 def roi_narrow(
     first_image: Path,
     following_images: Iterable[Path],
@@ -372,6 +387,7 @@ ROI_METHODS: dict[str, ROISelector] = {
     "openai": roi_openai,
     "wide": roi_wide,
     "medium": roi_medium,
+    "medium_modded": roi_medium_modded,
     "narrow": roi_narrow,
     "left": roi_left_biased,
     "right": roi_right_biased,

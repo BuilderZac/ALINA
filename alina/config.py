@@ -28,7 +28,23 @@ class PipelineConfig:
     yellow_upper: tuple[int, int, int] = (255, 255, 255)
 
     threshold_method: str = "manual"
+    threshold_mode: str = "first"
     threshold_openai_model: str = "gpt-4.1-mini"
+
+    # Runtime state used when threshold_mode == "first".
+    threshold_state: object | None = field(
+        default=None,
+        init=False,
+        repr=False,
+    )
+
+    # Path to a trained Random Forest or XGBoost model.
+    threshold_model_path: Path | None = None
+
+    # Deterministic settings for ML threshold methods.
+    threshold_seed: int = 42
+    threshold_clusters: int = 3
+    threshold_sample_size: int = 25_000
 
     # Zero out mask columns 0..mask_ignore_left_columns.
     mask_ignore_left_columns: int = 300
@@ -39,6 +55,9 @@ class PipelineConfig:
         self.input_dir = Path(self.input_dir)
         self.output_images_dir = Path(self.output_images_dir)
         self.output_coords_dir = Path(self.output_coords_dir)
+
+        if self.threshold_model_path is not None:
+            self.threshold_model_path = Path(self.threshold_model_path)
 
         self.output_images_dir.mkdir(parents=True, exist_ok=True)
         self.output_coords_dir.mkdir(parents=True, exist_ok=True)
@@ -56,4 +75,3 @@ class EvaluationConfig:
     def __post_init__(self) -> None:
         self.canny_dirs = [Path(path) for path in self.canny_dirs]
         self.alina_dirs = [Path(path) for path in self.alina_dirs]
-
